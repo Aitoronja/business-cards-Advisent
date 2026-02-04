@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generador de Contactos QR</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        input, textarea { width: 100%; padding: 10px; margin: 5px 0; }
+        .btn { background: blue; color: white; padding: 15px; border: none; }
+    </style>
+</head>
+<body>
+    <h1>Generador de Páginas para Contactos</h1>
+    
+    <label>Nombre del archivo:</label>
+    <input type="text" id="nombreArchivo" placeholder="juan-perez">
+    
+    <label>Nombre completo:</label>
+    <input type="text" id="nombre" placeholder="Juan Pérez">
+    
+    <label>Teléfono:</label>
+    <input type="text" id="telefono" placeholder="+549112223344">
+    
+    <label>Email:</label>
+    <input type="text" id="email" placeholder="juan@empresa.com">
+    
+    <button class="btn" onclick="generar()">Generar Archivos</button>
+    
+    <div id="resultado" style="display:none; margin-top:20px;">
+        <h3>Archivos listos:</h3>
+        <p>1. Descarga <button onclick="descargarVCF()">contacto.vcf</button></p>
+        <p>2. Descarga <button onclick="descargarHTML()">contacto.html</button></p>
+        <p>3. Sube ambos a GitHub</p>
+    </div>
+
+    <script>
+        function generar() {
+            const nombre = document.getElementById('nombre').value;
+            const telefono = document.getElementById('telefono').value;
+            const email = document.getElementById('email').value;
+            const archivo = document.getElementById('nombreArchivo').value;
+            
+            // Crear VCF
+            const vcf = `BEGIN:VCARD
+VERSION:3.0
+FN:${nombre}
+TEL:${telefono}
+EMAIL:${email}
+END:VCARD`;
+            
+            // Crear HTML simple
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Contacto</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; }
+        .btn { background: blue; color: white; padding: 15px; border: none; }
+    </style>
+    <script>
+        function descargar() {
+            window.location.href = '${archivo}.vcf';
+        }
+    <\/script>
+</head>
+<body>
+    <h2>Contacto: ${nombre}</h2>
+    <button class="btn" onclick="descargar()">Descargar Contacto</button>
+    <p>Android: Abre el archivo .vcf desde Descargas</p>
+</body>
+</html>`;
+            
+            // Guardar para descargar
+            window.vcfContent = vcf;
+            window.htmlContent = html;
+            window.nombreArchivo = archivo;
+            
+            document.getElementById('resultado').style.display = 'block';
+        }
+        
+        function descargarVCF() {
+            const link = document.createElement('a');
+            const blob = new Blob([window.vcfContent], { type: 'text/vcard' });
+            link.href = URL.createObjectURL(blob);
+            link.download = window.nombreArchivo + '.vcf';
+            link.click();
+        }
+        
+        function descargarHTML() {
+            const link = document.createElement('a');
+            const blob = new Blob([window.htmlContent], { type: 'text/html' });
+            link.href = URL.createObjectURL(blob);
+            link.download = window.nombreArchivo + '.html';
+            link.click();
+        }
+    </script>
+</body>
+</html>
